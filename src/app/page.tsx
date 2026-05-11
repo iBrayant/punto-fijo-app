@@ -311,6 +311,7 @@ export default function FixedPointApp() {
             </div>
           )}
 
+          {chartData.length > 0 && (
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
               <h3 className="font-semibold text-slate-800 mb-6">Visualización de la Función</h3>
               {/* 
