@@ -52,6 +52,11 @@ export default function FixedPointApp() {
     setHasCalculated(true);
 
     try {
+      // --- INICIO DEL PROCESO MATEMÁTICO ---
+      // 1. Captura y validación de parámetros iniciales:
+      // x0: El punto de partida (semilla) para la iteración.
+      // tol: El umbral de error permitido (criterio de parada).
+      // maxI: Límite de seguridad para evitar bucles infinitos si el método diverge.
       let x_curr = parseFloat(x0);
       const tolerance = parseFloat(tol);
       const maxI = parseInt(maxIter);
@@ -60,44 +65,63 @@ export default function FixedPointApp() {
         throw new Error("Por favor, ingresa valores numéricos válidos.");
       }
 
+      // 2. Definición de la función g(x):
+      // El método del punto fijo requiere transformar la ecuación original f(x) = 0 
+      // en la forma x = g(x).
       const g = (x: number) => evaluate(func, { x });
 
       const iterData: IterationData[] = [];
-      let ea = 100;
-      let iter = 0;
+      let ea = 100; // Error aproximado inicial (se asume alto para entrar al bucle)
+      let iter = 0; // Contador de iteraciones ejecutadas
       let rootFound = false;
       let x_next = x_curr;
 
+      // 3. Ciclo Iterativo:
+      // Se repite mientras no se supere el número máximo de iteraciones (límite de seguridad).
       while (iter < maxI) {
         iter++;
         
+        // FÓRMULA CENTRAL: x_{i+1} = g(x_i)
+        // Se calcula el siguiente valor de x evaluando el actual en g(x).
         x_next = g(x_curr);
 
+        // Validación de convergencia/dominio:
+        // Si el resultado no es un número real o es infinito, el método diverge.
         if (isNaN(x_next) || !isFinite(x_next)) {
            throw new Error("La función diverge o genera un valor indefinido.");
         }
 
+        // CÁLCULO DEL ERROR RELATIVO PORCENTUAL:
+        // ea = |(x_nuevo - x_anterior) / x_nuevo| * 100
+        // Este valor nos dice qué tanto está cambiando la aproximación.
         ea = Math.abs((x_next - x_curr) / x_next) * 100;
 
+        // Guardamos los datos para la tabla de resultados
         iterData.push({
           i: iter,
           x_i: x_next,
           ea: ea,
         });
 
+        // (Umbral del error):
+        // Si el error calculado es menor o igual a la tolerancia definida por el usuario,
+        // consideramos que hemos encontrado una aproximación válida de la raíz.
         if (ea <= tolerance) {
           rootFound = true;
           break;
         }
 
+        // Preparación para la siguiente iteración: el x actual pasa a ser el x anterior.
         x_curr = x_next;
       }
 
       setResults(iterData);
 
+      // 4. Resultado final:
       if (rootFound) {
-        setRoot(x_next);
+        setRoot(x_next); // Éxito: se alcanzó la precisión deseada
       } else {
+        // El bucle terminó por alcanzar maxI sin llegar a la tolerancia (No hubo convergencia)
         setErrorMsg("El método no convergió en el número máximo de iteraciones.");
       }
 
@@ -213,13 +237,15 @@ export default function FixedPointApp() {
             </form>
           </div>
           
-          {/* Formula Card */}
+          {/* Visualización de Fórmulas Matemáticas (LaTeX) */}
           <div className="bg-purple-50/50 p-6 rounded-2xl border border-purple-100">
             <h3 className="text-sm font-semibold text-purple-900 mb-3 uppercase tracking-wider">Fórmula de Iteración</h3>
             <div className="text-center overflow-x-auto py-2">
+              {/* x_{i+1} = g(x_i) es la base del método */}
               <BlockMath math="x_{i+1} = g(x_i)" />
             </div>
             <div className="text-center overflow-x-auto py-2 mt-2">
+              {/* Fórmula del error aproximado relativo porcentual */}
               <BlockMath math="\varepsilon_a = \left| \frac{x_{i+1} - x_i}{x_{i+1}} \right| \times 100\%" />
             </div>
           </div>
@@ -285,9 +311,15 @@ export default function FixedPointApp() {
             </div>
           )}
 
-          {chartData.length > 0 && (
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
               <h3 className="font-semibold text-slate-800 mb-6">Visualización de la Función</h3>
+              {/* 
+                  GRÁFICA:
+                  - La línea morada representa g(x).
+                  - La línea punteada gris es y = x.
+                  - La raíz es la intersección entre g(x) y y = x.
+                  - El punto verde es la raíz encontrada.
+              */}
               <div className="h-[400px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
