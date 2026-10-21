@@ -60,6 +60,6 @@ Con `g(x) = sqrt(x + 2)`, `x₀ = 1`, tolerancia `0.001` y 50 iteraciones, el m�
 
 ## Autor
 
-**Brayant Vásquez Gómez** · [GitHub](https://github.com/iBrayant) · [LinkedIn](https://linkedin.com/in/brayant-vásquez-gómez)
+**Brayant Vásquez Gómez** · [GitHub](https://github.com/iBrayant) · [LinkedIn](https://www.linkedin.com/in/brayant-v%C3%A1squez-g%C3%B3mez-4b483a1a1)
 
 Licencia [MIT](LICENSE).
